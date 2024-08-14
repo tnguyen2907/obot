@@ -1,0 +1,12 @@
+services:
+  scraper:
+    image: scraper
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+      - DEBUG=1
+    volumes:
+      - C:\Users\trung\AppData\Roaming\gcloud\application_default_credentials.json:/app/credentials.json

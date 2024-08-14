@@ -11,12 +11,18 @@ def main():
     parser.add_argument('spiders', nargs='+', choices=['blogspider', 'bulletinspider', 'catalogspider', 'eventspider', 'newsspider', 'oberlinspider', "debugspider"], help="Names of the spiders to run")
     parser.add_argument('-ll', '--loglevel', default='INFO', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help="Log level")
     parser.add_argument('-lf', '--logfile', default='logs/spiders.log', help="Log file path")
+    parser.add_argument('--dryrun', action='store_true', help="Run spiders without adding items to Firestore (disables EncodingAndStoringPipeline)")
 
     args = parser.parse_args()
 
     settings = get_project_settings()
     settings.set("LOG_LEVEL", args.loglevel)
     settings.set("LOG_FILE", args.logfile)
+
+    if args.dryrun:
+        settings.set("ITEM_PIPELINES", {
+            "obot_scraper.pipelines.CleaningAndChunkingPipeline": 300
+        })
 
     #create output and logs directories if they don't exist
     os.makedirs("output", exist_ok=True)

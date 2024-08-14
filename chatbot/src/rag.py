@@ -11,6 +11,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from google.generativeai.types.safety_types import HarmBlockThreshold, HarmCategory
 
 GCP_PROJECT_ID = os.environ["GCP_PROJECT_ID"]
+os.environ["GCLOUD_PROJECT"] = GCP_PROJECT_ID
 os.environ["LANGCHAIN_PROJECT"] = "obot"
 os.environ["LANGSMITH_TRACING"] = "true"
 class SafetyException(Exception):
@@ -89,6 +90,9 @@ It is not provided by the user, so if you need to refer to the data, say it is m
 
 Focus your answers on Oberlin College. If a user asks a question that doesn't relate to Oberlin College \
 and there is no relevant context, apologize and inform the user that you can only answer questions related to Oberlin College.
+
+Note that not all the data retrieved is relevant to the question. Pay attention to the user's lastest question and only \
+use the relevant data to answer the question.
 
 Always based your answer on the retrived data. If you cannot answer a question from the retrieved data, don't make up answer. \
 Apologize and, only if appropriate, suggest the user find the information on the official Oberlin College website or contact the college directly.

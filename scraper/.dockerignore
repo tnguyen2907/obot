@@ -1,0 +1,5 @@
+Dockerfile
+docker-compose*
+**/__pycache__/
+**/logs/
+**/output/

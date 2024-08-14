@@ -1,0 +1,5 @@
+scrapy
+bs4
+google-cloud-firestore
+google-cloud-aiplatform
+langchain-text-splitters
