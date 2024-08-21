@@ -15,7 +15,8 @@ class BulletinspiderSpider(scrapy.Spider):
     custom_settings = {
         'FEEDS': {
             'output/bulletins.json': {'format': 'json', 'overwrite': True},
-        }
+        },
+        "LOG_FILE": "logs/bulletins.log",
     }
 
     def parse(self, response):

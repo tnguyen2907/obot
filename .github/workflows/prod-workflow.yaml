@@ -1,0 +1,17 @@
+name: Prod CI/CD workflow
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  prod-workflow:
+    uses: ./.github/workflows/workflow-template.yaml
+    with:
+      env: 'prod'
+      dry_run: false
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write

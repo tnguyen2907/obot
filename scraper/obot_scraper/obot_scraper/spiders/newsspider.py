@@ -15,7 +15,8 @@ class NewsspiderSpider(scrapy.Spider):
     custom_settings = {
         'FEEDS': {
             'output/news.json': {'format': 'json', 'overwrite': True},
-        }
+        },
+        "LOG_FILE": "logs/news.log",
     }
 
     def parse(self, response):

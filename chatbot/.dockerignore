@@ -1,4 +1,4 @@
 __pycache__
-ignore*
+**/ignore*
 docker-compose*
 Dockerfile

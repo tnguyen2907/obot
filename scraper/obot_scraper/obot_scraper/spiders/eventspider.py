@@ -14,7 +14,8 @@ class EventspiderSpider(scrapy.Spider):
     custom_settings = {
         'FEEDS': {
             'output/events.json': {'format': 'json', 'overwrite': True},
-        }
+        },
+        "LOG_FILE": "logs/events.log",
     }
 
     def __init__(self):

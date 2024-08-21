@@ -3,6 +3,7 @@ ignore*
 **/__pycache__/
 **/logs/
 **/output/
+**/docker-compose.yaml
 
 # Terraform
 **/.terraform/*

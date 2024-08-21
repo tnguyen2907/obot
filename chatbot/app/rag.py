@@ -14,6 +14,7 @@ GCP_PROJECT_ID = os.environ["GCP_PROJECT_ID"]
 os.environ["GCLOUD_PROJECT"] = GCP_PROJECT_ID
 os.environ["LANGCHAIN_PROJECT"] = "obot"
 os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGCHAIN_ENDPOINT"]="https://api.smith.langchain.com"
 class SafetyException(Exception):
     pass
 

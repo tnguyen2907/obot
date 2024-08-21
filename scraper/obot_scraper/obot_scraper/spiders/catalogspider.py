@@ -15,7 +15,8 @@ class CatalogspiderSpider(scrapy.Spider):
     custom_settings = {
         'FEEDS': {
             'output/catalog.json': {'format': 'json', 'overwrite': True},
-        }
+        },
+        "LOG_FILE": "logs/catalog.log",
     }
 
 

@@ -1,0 +1,48 @@
+# Have to use envsubst to replace the variables
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chatbot-sa
+  annotations:
+    iam.gke.io/gcp-service-account: obot-chatbot@$GCP_PROJECT_ID.iam.gserviceaccount.com
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "chatbot-deployment"
+  namespace: "default"
+  labels:
+    app: "chatbot"
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: "chatbot"
+  template:
+    metadata:
+      labels:
+        app: "chatbot"
+    spec:
+      serviceAccountName: chatbot-sa
+      containers:
+      - name: "chatbot"
+        image: "us-east1-docker.pkg.dev/$GCP_PROJECT_ID/obot-dev/chatbot:in-use"
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8501 # Streamlit port
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "chatbot-service"
+spec:
+  selector:
+    app: "chatbot"
+  type: "LoadBalancer"
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 8501
+
+
+

@@ -12,10 +12,12 @@ class BlogspiderSpider(scrapy.Spider):
     ignored_words = ['news', 'news-and-events', 'events', 'bulletins']
     pagination_flags = ['page', 'blog_tag']
 
+    # Custom settings to store the scraped data in a JSON file and logfile
     custom_settings = {
         'FEEDS': {
             'output/blogs.json': {'format': 'json', 'overwrite': True},
-        }
+        },
+        "LOG_FILE": "logs/blogs.log",
     }
 
     def parse(self, response):

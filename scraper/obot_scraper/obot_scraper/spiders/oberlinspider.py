@@ -15,7 +15,8 @@ class OberlinspiderSpider(scrapy.Spider):
     custom_settings = {
         'FEEDS': {
             'output/oberlin.json': {'format': 'json', 'overwrite': True},
-        }
+        },
+        "LOG_FILE": "logs/oberlin.log",
     }
 
     def parse(self, response):
