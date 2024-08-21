@@ -49,7 +49,7 @@ resource "google_container_node_pool" "prod-node-pool" {
   }
 
   autoscaling {
-    total_min_node_count = 1
+    total_min_node_count = 0
     total_max_node_count = 1
   }
 
@@ -68,6 +68,12 @@ resource "google_container_node_pool" "prod-node-pool" {
     #   value = "prod"
     #   effect = "NO_SCHEDULE"
     # }
+
+    taint {
+      key = "env"
+      value = "prod"
+      effect = "PREFER_NO_SCHEDULE"
+    }
 
     service_account = "obot-chatbot@${var.GCP_PROJECT_ID}.iam.gserviceaccount.com"
     oauth_scopes = [
@@ -119,3 +125,31 @@ resource "google_container_node_pool" "dev-node-pool" {
 
   depends_on = [ google_container_cluster.primary ]
 }
+
+resource "google_container_node_pool" "free-tier-node-pool" {
+  name = "free-tier-node-pool"
+  location = "${var.REGION}-b"
+  cluster = google_container_cluster.primary.id
+
+  management {
+    auto_repair = true
+    auto_upgrade = true
+  }
+
+  node_count = 1
+
+  node_config {
+    machine_type = "e2-micro"
+    disk_type = "pd-standard"
+    disk_size_gb = 10
+
+    service_account = "obot-chatbot@${var.GCP_PROJECT_ID}.iam.gserviceaccount.com"
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/devstorage.read_only"
+    ]
+  }
+
+  depends_on = [ google_container_cluster.primary ]
+}
+  

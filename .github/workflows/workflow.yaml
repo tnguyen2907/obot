@@ -244,43 +244,43 @@ jobs:
         run: ./kustomize build chatbot/kustomize/overlays/$ENV | envsubst | kubectl apply -f -
 
       
-  test-changes:
-    needs: check-diff
-    name: Test changes
-    runs-on: ubuntu-latest
+  # test-changes:
+  #   needs: check-diff
+  #   name: Test changes
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
       
-      - name: Debug ref name
-        run: echo ${{ github.ref_name}}
+  #     - name: Debug ref name
+  #       run: echo ${{ github.ref_name}}
 
-      - name: Debug logic
-        run: |
-          echo ${{ (github.ref_name == 'master' && 'prod') || 'dev' }}
-          echo ${{ (github.ref_name == 'master' && 'prod') }}
-          echo ${{ (true && 'prod') }}
-          echo ${{ 'prod' || 'dev' }}
+  #     - name: Debug logic
+  #       run: |
+  #         echo ${{ (github.ref_name == 'master' && 'prod') || 'dev' }}
+  #         echo ${{ (github.ref_name == 'master' && 'prod') }}
+  #         echo ${{ (true && 'prod') }}
+  #         echo ${{ 'prod' || 'dev' }}
 
-      - name: Debug environment variables
-        run: |
-          echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}"
-          echo "WORKLOAD_IDENTITY_PROVIDER: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}"
-          echo "SERVICE_ACCOUNT: ${{ env.SERVICE_ACCOUNT }}"
-          echo "ENV: ${{ env.ENV }}"
-          echo "DRY_RUN: ${{ env.DRY_RUN }}"
+  #     - name: Debug environment variables
+  #       run: |
+  #         echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}"
+  #         echo "WORKLOAD_IDENTITY_PROVIDER: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}"
+  #         echo "SERVICE_ACCOUNT: ${{ env.SERVICE_ACCOUNT }}"
+  #         echo "ENV: ${{ env.ENV }}"
+  #         echo "DRY_RUN: ${{ env.DRY_RUN }}"
 
-      - name: Test Scraper
-        if: ${{ needs.check-diff.outputs.scraper_changed == 'true' }}
-        run: |
-          echo "Scraper has changed"
-      - name: Test Chatbot
-        if: ${{ needs.check-diff.outputs.chatbot_changed == 'true' }}
-        run: |
-          echo "Chatbot has changed"
-      - name: Test Terraform
-        if: ${{ needs.check-diff.outputs.terraform_changed == 'true' }}
-        run: |
-          echo "Terraform has changed"
+  #     - name: Test Scraper
+  #       if: ${{ needs.check-diff.outputs.scraper_changed == 'true' }}
+  #       run: |
+  #         echo "Scraper has changed"
+  #     - name: Test Chatbot
+  #       if: ${{ needs.check-diff.outputs.chatbot_changed == 'true' }}
+  #       run: |
+  #         echo "Chatbot has changed"
+  #     - name: Test Terraform
+  #       if: ${{ needs.check-diff.outputs.terraform_changed == 'true' }}
+  #       run: |
+  #         echo "Terraform has changed"
     
