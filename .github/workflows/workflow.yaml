@@ -1,18 +1,7 @@
 name: Obot CI/CD
 
 on:
-  workflow_call:
-    inputs:
-      env:
-        description: 'Environment to deploy to'
-        type: string
-        required: true
-        default: 'dev'
-      dry_run:
-        description: 'Dry run Terraform and Kustomize'
-        type: boolean
-        required: false
-        default: false
+  push:
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -20,14 +9,14 @@ env:
   WORKLOAD_IDENTITY_PROVIDER: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/obot-github-action"
   SERVICE_ACCOUNT: "obot-github-action@${{ secrets.GCP_PROJECT_ID  }}.iam.gserviceaccount.com"
 
-  ENV: ${{ inputs.env }}
+  ENV: ${{ (github.ref_name == 'master' && 'prod') || 'dev' }}
   SCRAPER_VERSION: "v0.0.0"
   CHATBOT_VERSION: "v0.0.0"
 
   GKE_CLUSTER: "primary"
   GKE_ZONE: "us-east1-b"
 
-  DRY_RUN: ${{ inputs.dry_run }}
+  DRY_RUN: 'false'
 
 jobs:
   check-diff:
@@ -252,39 +241,46 @@ jobs:
         
       - name: Apply Kustomized YAML
         if: env.DRY_RUN == 'false'
-        run: ./kustomize build chatbot/kustomize/overlays/$ENV | kubectl apply -f -
+        run: ./kustomize build chatbot/kustomize/overlays/$ENV | envsubst | kubectl apply -f -
 
       
-  # test-changes:
-  #   needs: check-diff
-  #   name: Test changes
-  #   runs-on: ubuntu-latest
+  test-changes:
+    needs: check-diff
+    name: Test changes
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       
-  #     - name: Debug ref name
-  #       run: echo ${{ github.ref_name}}
+      - name: Debug ref name
+        run: echo ${{ github.ref_name}}
 
-  #     - name: Debug environment variables
-  #       run: |
-  #         echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}"
-  #         echo "WORKLOAD_IDENTITY_PROVIDER: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}"
-  #         echo "SERVICE_ACCOUNT: ${{ env.SERVICE_ACCOUNT }}"
-  #         echo "ENV: ${{ env.ENV }}"
-  #         echo "DRY_RUN: ${{ env.DRY_RUN }}"
+      - name: Debug logic
+        run: |
+          echo ${{ (github.ref_name == 'master' && 'prod') || 'dev' }}
+          echo ${{ (github.ref_name == 'master' && 'prod') }}
+          echo ${{ (true && 'prod') }}
+          echo ${{ 'prod' || 'dev' }}
 
-  #     - name: Test Scraper
-  #       if: ${{ needs.check-diff.outputs.scraper_changed == 'true' }}
-  #       run: |
-  #         echo "Scraper has changed"
-  #     - name: Test Chatbot
-  #       if: ${{ needs.check-diff.outputs.chatbot_changed == 'true' }}
-  #       run: |
-  #         echo "Chatbot has changed"
-  #     - name: Test Terraform
-  #       if: ${{ needs.check-diff.outputs.terraform_changed == 'true' }}
-  #       run: |
-  #         echo "Terraform has changed"
+      - name: Debug environment variables
+        run: |
+          echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}"
+          echo "WORKLOAD_IDENTITY_PROVIDER: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}"
+          echo "SERVICE_ACCOUNT: ${{ env.SERVICE_ACCOUNT }}"
+          echo "ENV: ${{ env.ENV }}"
+          echo "DRY_RUN: ${{ env.DRY_RUN }}"
+
+      - name: Test Scraper
+        if: ${{ needs.check-diff.outputs.scraper_changed == 'true' }}
+        run: |
+          echo "Scraper has changed"
+      - name: Test Chatbot
+        if: ${{ needs.check-diff.outputs.chatbot_changed == 'true' }}
+        run: |
+          echo "Chatbot has changed"
+      - name: Test Terraform
+        if: ${{ needs.check-diff.outputs.terraform_changed == 'true' }}
+        run: |
+          echo "Terraform has changed"
     
