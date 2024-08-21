@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: "chatbot"
-        image: "us-east1-docker.pkg.dev/$GCP_PROJECT_ID/obot-dev/chatbot:in-use"
+        image: "us-east1-docker.pkg.dev/$GCP_PROJECT_ID/obot-prod/chatbot:in-use"
       tolerations:
       - key: "env"
         operator: "Equal"

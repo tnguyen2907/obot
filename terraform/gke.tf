@@ -54,7 +54,7 @@ resource "google_container_node_pool" "prod-node-pool" {
   }
 
   node_config {
-    machine_type = "e2-micro"
+    machine_type = "e2-medium"
     disk_type = "pd-standard"
     disk_size_gb = 10
 
@@ -95,7 +95,7 @@ resource "google_container_node_pool" "dev-node-pool" {
 
   node_config {
     preemptible = true
-    machine_type = "e2-small"
+    machine_type = "e2-medium"
     disk_type = "pd-standard"
     disk_size_gb = 10
 

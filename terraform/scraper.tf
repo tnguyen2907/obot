@@ -39,8 +39,8 @@ locals {
 
 # Get digest of the image
 data "google_artifact_registry_docker_image" "scraper-image" {
-  repository_id = google_artifact_registry_repository.obot-dev-repo.repository_id
-  location = google_artifact_registry_repository.obot-dev-repo.location
+  repository_id = google_artifact_registry_repository.obot-prod-repo.repository_id
+  location = google_artifact_registry_repository.obot-prod-repo.location
   image_name = "scraper:in-use"
 }
 
@@ -54,10 +54,6 @@ resource "google_cloud_run_v2_job" "spiders" {
       timeout = "7200s"
       containers {
         image = data.google_artifact_registry_docker_image.scraper-image.self_link
-        # env {
-        #   name = "GCP_PROJECT_ID"
-        #   value = var.GCP_PROJECT_ID
-        # }
         command = [ "python", "run_spiders.py", each.key]
       }
     }

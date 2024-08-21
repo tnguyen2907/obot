@@ -5,6 +5,8 @@ resources:
   - ../../base
 
 nameSuffix: "-dev"
+commonLabels:
+  app: chatbot-dev
 
 patches:
   - path: deployment.yaml

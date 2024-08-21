@@ -233,7 +233,7 @@ jobs:
           echo "IMAGE_IN_USE=$REGION-docker.pkg.dev/\$GCP_PROJECT_ID/obot-$ENV/chatbot:in-use"
           echo "IMAGE_IN_USE=$REGION-docker.pkg.dev/\$GCP_PROJECT_ID/obot-$ENV/chatbot:in-use" >> $GITHUB_ENV
           IMAGE_WITH_DIGEST=$(curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-          "https://artifactregistry.us-east1.rep.googleapis.com/v1/projects/$GCP_PROJECT_ID/locations/us-east1/repositories/obot-dev/dockerImages" | \
+          "https://artifactregistry.us-east1.rep.googleapis.com/v1/projects/$GCP_PROJECT_ID/locations/us-east1/repositories/obot-$ENV/dockerImages" | \
           jq -r '.dockerImages[] | select(.tags[] | contains("in-use")) | select(.uri | contains("chatbot")) | .uri')
           echo "Image with digest: $IMAGE_WITH_DIGEST"
           echo "IMAGE_WITH_DIGEST=$IMAGE_WITH_DIGEST" >> $GITHUB_ENV
@@ -255,36 +255,36 @@ jobs:
         run: ./kustomize build chatbot/kustomize/overlays/$ENV | kubectl apply -f -
 
       
-  test-changes:
-    needs: check-diff
-    name: Test changes
-    runs-on: ubuntu-latest
+  # test-changes:
+  #   needs: check-diff
+  #   name: Test changes
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
       
-      - name: Debug ref name
-        run: echo ${{ github.ref_name}}
+  #     - name: Debug ref name
+  #       run: echo ${{ github.ref_name}}
 
-      - name: Debug environment variables
-        run: |
-          echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}"
-          echo "WORKLOAD_IDENTITY_PROVIDER: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}"
-          echo "SERVICE_ACCOUNT: ${{ env.SERVICE_ACCOUNT }}"
-          echo "ENV: ${{ env.ENV }}"
-          echo "DRY_RUN: ${{ env.DRY_RUN }}"
+  #     - name: Debug environment variables
+  #       run: |
+  #         echo "GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}"
+  #         echo "WORKLOAD_IDENTITY_PROVIDER: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}"
+  #         echo "SERVICE_ACCOUNT: ${{ env.SERVICE_ACCOUNT }}"
+  #         echo "ENV: ${{ env.ENV }}"
+  #         echo "DRY_RUN: ${{ env.DRY_RUN }}"
 
-      - name: Test Scraper
-        if: ${{ needs.check-diff.outputs.scraper_changed == 'true' }}
-        run: |
-          echo "Scraper has changed"
-      - name: Test Chatbot
-        if: ${{ needs.check-diff.outputs.chatbot_changed == 'true' }}
-        run: |
-          echo "Chatbot has changed"
-      - name: Test Terraform
-        if: ${{ needs.check-diff.outputs.terraform_changed == 'true' }}
-        run: |
-          echo "Terraform has changed"
+  #     - name: Test Scraper
+  #       if: ${{ needs.check-diff.outputs.scraper_changed == 'true' }}
+  #       run: |
+  #         echo "Scraper has changed"
+  #     - name: Test Chatbot
+  #       if: ${{ needs.check-diff.outputs.chatbot_changed == 'true' }}
+  #       run: |
+  #         echo "Chatbot has changed"
+  #     - name: Test Terraform
+  #       if: ${{ needs.check-diff.outputs.terraform_changed == 'true' }}
+  #       run: |
+  #         echo "Terraform has changed"
     

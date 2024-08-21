@@ -1,7 +1,7 @@
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
-  name: "chatbot-deployment-dev"
+  name: "chatbot-deployment"
 spec:
   replicas: 1
   strategy:
