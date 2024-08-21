@@ -54,7 +54,8 @@ resource "google_container_node_pool" "prod-node-pool" {
   }
 
   node_config {
-    machine_type = "e2-medium"
+    preemptible = true
+    machine_type = "e2-small"
     disk_type = "pd-standard"
     disk_size_gb = 10
 
@@ -95,7 +96,7 @@ resource "google_container_node_pool" "dev-node-pool" {
 
   node_config {
     preemptible = true
-    machine_type = "e2-medium"
+    machine_type = "e2-small"
     disk_type = "pd-standard"
     disk_size_gb = 10
 
@@ -103,11 +104,11 @@ resource "google_container_node_pool" "dev-node-pool" {
       env = "dev"
     }
 
-    # taint {
-    #   key = "env"
-    #   value = "dev"
-    #   effect = "NO_SCHEDULE"
-    # }
+    taint {
+      key = "env"
+      value = "dev"
+      effect = "NO_SCHEDULE"
+    }
 
     service_account = "obot-chatbot@${var.GCP_PROJECT_ID}.iam.gserviceaccount.com"
     oauth_scopes = [

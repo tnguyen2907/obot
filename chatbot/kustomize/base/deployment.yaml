@@ -29,7 +29,16 @@ spec:
         image: "us-east1-docker.pkg.dev/$GCP_PROJECT_ID/obot-dev/chatbot:in-use"
         imagePullPolicy: "Always"
         ports:
-        - containerPort: 8501 # Streamlit port
+        - containerPort: 8501 # Streamlit 
+      tolerations:
+      - key: "env"
+        operator: "Equal"
+        value: "dev"
+        effect: "NoSchedule"
+      - key: "env"
+        operator: "Equal"
+        value: "prod"
+        effect: "NoSchedule"
 ---
 apiVersion: "v1"
 kind: "Service"

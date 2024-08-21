@@ -12,4 +12,4 @@ patches:
   - path: deployment.yaml
     target:
       kind: Deployment
-      name: chatbot
+      name: chatbot-deployment
