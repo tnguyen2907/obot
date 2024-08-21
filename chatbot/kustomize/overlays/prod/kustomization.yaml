@@ -5,6 +5,8 @@ resources:
   - ../../base
 
 nameSuffix: "-prod"
+commonLabels:
+  app: chatbot-prod
 
 patches:
   - path: deployment.yaml
