@@ -10,7 +10,9 @@ from itemadapter import ItemAdapter
 from datetime import datetime, timezone, timedelta
 import hashlib
 import logging
-from obot_scraper.text_processing.html_to_chunks import html_to_chunks
+from io import BytesIO
+from obot_scraper.processing_utils.html import html_to_chunks
+from obot_scraper.processing_utils.file import file_to_chunks
 
 from google.cloud import firestore
 from google.cloud.firestore_v1.vector import Vector
@@ -54,9 +56,11 @@ class CleaningAndChunkingPipeline:
                 logging.warning("Failed to convert date_happened to datetime object for url: {}. Exception: {}".format(adapter['url'], e))  
                 adapter['metadata']['date_happened'] = None
                 
-
-        # Transform html into text then split into chunks
-        chunks = html_to_chunks(adapter['content'], type=adapter['type'])
+        # Convert content to chunks
+        if adapter['url'].endswith(('.pdf', '.docx', '.pptx', '.xlsx')) or adapter['url'].startswith(("https://drive.google.com", "https://drive.usercontent.google.com")):
+            chunks = file_to_chunks(file=BytesIO(adapter['content']), url=adapter['url'])
+        else:
+            chunks = html_to_chunks(html=adapter['content'], type=adapter['type'])
 
         adapter['content'] = chunks
 
@@ -129,8 +133,8 @@ class EncodingAndStoringPipeline:
                 doc.reference.delete()
 
         def is_modified():
-            check_by_time = ['official', 'news', 'event', 'blog']
-            check_by_hash = ['catalog', 'external']
+            check_by_time = ['official', 'news', 'event', 'blog', 'bulletin']
+            check_by_hash = ['catalog', 'external', 'file']
             if adapter['type'] in check_by_time:
                 if adapter['website_last_modified_time'] > docs[0].to_dict()['website_last_modified_time']:
                     return True
@@ -158,6 +162,7 @@ class EncodingAndStoringPipeline:
             if is_modified():   # doc modified, update the document scrape time and replace the embeddings
                 logging.debug("Updating existing document and replacing embeddings")
                 self.db.collection('metadata').document(docs[0].id).update({
+                    'type': adapter['type'],
                     'website_last_modified_time': adapter['website_last_modified_time'],
                     'scraped_time': adapter['scraped_time'],
                     'hash_value': adapter['hash_value'],
@@ -168,9 +173,12 @@ class EncodingAndStoringPipeline:
                 EncodingAndStoringPipeline.num_updated_urls += 1
                 EncodingAndStoringPipeline.updated_url_lst.append(adapter['url'])
             else:   # doc not modified, only update the document scrape time
-                logging.debug("Updating existing document (only scrape time)")
+                logging.debug("Updating existing document")
                 self.db.collection('metadata').document(docs[0].id).update({
+                    'type': adapter['type'],
+                    'website_last_modified_time': adapter['website_last_modified_time'],
                     'scraped_time': adapter['scraped_time'],
+                    'hash_value': adapter['hash_value'],
                 })
 
 

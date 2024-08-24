@@ -28,22 +28,15 @@ class NewsspiderSpider(scrapy.Spider):
                 if flag in parse_qs(urlparse(response.url).query):
                     pagination_in_url = True
         if not pagination_in_url:
-            # Extract the last modified time of the website
-            modified_time = response.xpath("//meta[@property='article:modified_time']/@content").get()
-
-            html_content = response.body.decode('utf-8')
-
-            date_happened = response.css('.date-display-single::text').get()
-
             website_item = WebsiteItem()
 
             website_item['url'] = response.url
             website_item['type'] = 'news'
             if not response.url.startswith("https://www.oberlin.edu"):
                 website_item['type'] = 'external'
-            website_item['website_last_modified_time'] = modified_time
-            website_item['content'] = html_content
-            website_item["metadata"] = {"date_happened": date_happened}
+            website_item['website_last_modified_time'] = response.xpath("//meta[@property='article:modified_time']/@content").get() # Extract the last modified time of the website
+            website_item['content'] = response.body.decode('utf-8')
+            website_item["metadata"] = {"date_happened": response.css('.date-display-single::text').get()}
 
             yield website_item
 

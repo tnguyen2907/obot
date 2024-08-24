@@ -56,3 +56,16 @@ resource "google_compute_subnetwork" "gke-subnet" {
 #   direction = "EGRESS"
 #   destination_ranges = ["0.0.0.0/0"]
 # }
+
+resource "google_compute_firewall" "allow-obot" {
+  name    = "allow-obot"
+  network = google_compute_network.my-vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["31037"]
+  }  
+
+  direction = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
+}

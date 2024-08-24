@@ -23,21 +23,15 @@ class CatalogspiderSpider(scrapy.Spider):
     def parse(self, response):
         # Only yield the website item if the URL does not have the 'print' flag and the 'navoid=5080' flag
         if '&print' not in response.url and 'navoid=5080' not in response.url:
-            modified_time = None
-
-            html_content = response.body.decode('utf-8')
-
-            date_happened = None
-
             website_item = WebsiteItem()
 
             website_item['url'] = response.url
             website_item['type'] = 'catalog'
             if not response.url.startswith("https://catalog.oberlin.edu"):
                 website_item['type'] = 'external'
-            website_item['website_last_modified_time'] = modified_time
-            website_item['content'] = html_content
-            website_item["metadata"] = {"date_happened": date_happened}
+            website_item['website_last_modified_time'] = None
+            website_item['content'] = response.body.decode('utf-8')
+            website_item["metadata"] = {"date_happened": None}
 
             yield website_item
 

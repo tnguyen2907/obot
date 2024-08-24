@@ -69,19 +69,14 @@ class EventspiderSpider(scrapy.Spider):
                 yield scrapy.Request(absolute_url, callback=self.parse_event, cb_kwargs={'date_happened': date_happened})
 
     def parse_event(self, response, date_happened):
-        # Extract the last modified time of the website
-        modified_time = response.xpath("//meta[@property='article:modified_time']/@content").get()
-
-        html_content = response.body.decode('utf-8')
-
         website_item = WebsiteItem()
 
         website_item['url'] = response.url
         website_item['type'] = 'event'
         if not response.url.startswith("https://www.oberlin.edu"):
             website_item['type'] = 'external'
-        website_item['website_last_modified_time'] = modified_time
-        website_item['content'] = html_content
+        website_item['website_last_modified_time'] = response.xpath("//meta[@property='article:modified_time']/@content").get() # Extract the last modified time of the website
+        website_item['content'] = response.body.decode('utf-8')
         website_item["metadata"] = {"date_happened": date_happened}
 
         yield website_item

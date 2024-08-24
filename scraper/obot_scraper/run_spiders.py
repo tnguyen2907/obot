@@ -45,9 +45,10 @@ def main():
     if len(args.spiders) > 1:
         settings.set("LOG_FILE", args.logfile)
 
-    if args.dryrun:
+    if not args.dryrun:
         settings.set("ITEM_PIPELINES", {
-            "obot_scraper.pipelines.CleaningAndChunkingPipeline": 300
+            "obot_scraper.pipelines.CleaningAndChunkingPipeline": 300,
+            "obot_scraper.pipelines.EncodingAndStoringPipeline": 400,
         })
 
     #create output and logs directories if they don't exist

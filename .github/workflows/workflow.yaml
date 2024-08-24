@@ -10,7 +10,7 @@ env:
   SERVICE_ACCOUNT: "obot-github-action@${{ secrets.GCP_PROJECT_ID  }}.iam.gserviceaccount.com"
 
   ENV: ${{ (github.ref_name == 'master' && 'prod') || 'dev' }}
-  SCRAPER_VERSION: "v0.0.0"
+  SCRAPER_VERSION: "v0.0.1"
   CHATBOT_VERSION: "v0.0.0"
 
   GKE_CLUSTER: "primary"

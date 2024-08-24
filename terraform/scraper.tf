@@ -17,22 +17,22 @@ resource "google_storage_bucket" "scraper-output" {
 locals {
   spiders = {
     blogspider = {
-      schedule = "50 13 * * 4"
+      schedule = "0 8 * * *"
     }
     bulletinspider = {
-      schedule = "50 13 * * 4"
+      schedule = "0 8 * * *"
     }
     catalogspider = {
-      schedule = "50 13 * * 4"
+      schedule = "0 8 * * *"
     }
     eventspider = {
-      schedule = "50 13 * * 4"
+      schedule = "0 8 * * *"
     }
     newsspider = {
-      schedule = "50 13 * * 4"
+      schedule = "0 8 * * *"
     }
     oberlinspider = {
-      schedule = "50 13 * * 4"
+      schedule = "0 8 * * *"
     }
   }
 }

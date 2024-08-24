@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = "obot_scraper.spiders"
 #USER_AGENT = "obot_scraper (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -64,7 +64,7 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    "obot_scraper.pipelines.CleaningAndChunkingPipeline": 300,
-   "obot_scraper.pipelines.EncodingAndStoringPipeline": 400,
+   # "obot_scraper.pipelines.EncodingAndStoringPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

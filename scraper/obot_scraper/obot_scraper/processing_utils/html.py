@@ -75,7 +75,7 @@ def split_html_by_header(html):
         tree = etree.fromstring(html, parser)
     except:
         raise DropItem("Failed to parse HTML")
-    xslt_tree = etree.parse("obot_scraper/text_processing/html_chunks_with_headers.xslt")
+    xslt_tree = etree.parse("obot_scraper/processing_utils/html_chunks_with_headers.xslt")
     transform = etree.XSLT(xslt_tree)
     result = transform(tree)
 

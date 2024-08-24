@@ -149,6 +149,10 @@ resource "google_container_node_pool" "free-tier-node-pool" {
       "https://www.googleapis.com/auth/devstorage.read_only"
     ]
   }
+  
+  network_config {
+    enable_private_nodes = false
+  }
 
   depends_on = [ google_container_cluster.primary ]
 }

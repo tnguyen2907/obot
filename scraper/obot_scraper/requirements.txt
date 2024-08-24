@@ -3,3 +3,8 @@ bs4
 google-cloud-firestore
 google-cloud-aiplatform
 langchain-text-splitters
+
+pypdf[crypto]
+python-docx
+python-pptx
+openpyxl
