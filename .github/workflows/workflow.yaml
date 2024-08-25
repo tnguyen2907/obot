@@ -16,7 +16,7 @@ env:
   GKE_CLUSTER: "primary"
   GKE_ZONE: "us-east1-b"
 
-  DRY_RUN: 'false'
+  DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'true' }}
 
 jobs:
   check-diff:

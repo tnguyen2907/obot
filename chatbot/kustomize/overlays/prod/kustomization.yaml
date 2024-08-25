@@ -13,3 +13,7 @@ patches:
     target:
       kind: Deployment
       name: chatbot-deployment
+  - path: service.yaml
+    target:
+      kind: Service
+      name: chatbot-service

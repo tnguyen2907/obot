@@ -39,19 +39,7 @@ spec:
         operator: "Equal"
         value: "prod"
         effect: "NoSchedule"
----
-apiVersion: "v1"
-kind: "Service"
-metadata:
-  name: "chatbot-service"
-spec:
-  selector:
-    app: "chatbot"
-  type: "LoadBalancer"
-  ports:
-  - protocol: "TCP"
-    port: 80
-    targetPort: 8501
+
 
 
 

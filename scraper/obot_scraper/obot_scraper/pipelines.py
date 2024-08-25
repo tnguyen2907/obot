@@ -86,7 +86,6 @@ class EncodingAndStoringPipeline:
 
     def __init__(self):
         self.db = firestore.Client(project=GCP_PROJECT_ID, database="(default)")
-        self.transaction = self.db.transaction()
 
     def process_item(self, item, spider):
         adapter = ItemAdapter(item)
