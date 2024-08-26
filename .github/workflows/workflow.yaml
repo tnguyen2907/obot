@@ -232,17 +232,21 @@ jobs:
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
 
-      - name: Echo Kustomized YAML
+      - name: Echo YAML
         run: |
           cd chatbot/kustomize/overlays/$ENV
           sed -i "s|$IMAGE_IN_USE|$IMAGE_WITH_DIGEST|g" deployment.yaml
           echo "Kustomized YAML:"
           ../../../../kustomize build . | envsubst
+          echo "Shared YAML:"
+          envsubst < ../../base/serviceaccount.yaml
         
-      - name: Apply Kustomized YAML
+      - name: Deploy to GKE
         if: env.DRY_RUN == 'false'
         run: |
+          echo "Kustomized components:"
           ./kustomize build chatbot/kustomize/overlays/$ENV | envsubst | kubectl apply -f -
+          echo "Shared components:"
           envsubst < chatbot/kustomize/base/serviceaccount.yaml | kubectl apply -f -
       
   # test-changes:
