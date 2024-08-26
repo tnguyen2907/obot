@@ -24,6 +24,20 @@ resource "google_compute_subnetwork" "gke-subnet" {
   depends_on = [ google_compute_network.my-vpc ]
 }
 
+# Allow traffic on nodePort
+resource "google_compute_firewall" "allow-obot" {
+  name    = "allow-obot"
+  network = google_compute_network.my-vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["30000", "30001"]
+  }  
+
+  direction = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
+}
+
 # resource "google_compute_router" "my-router" {
 #   name    = "my-router"
 #   network = google_compute_network.my-vpc.id
@@ -56,16 +70,3 @@ resource "google_compute_subnetwork" "gke-subnet" {
 #   direction = "EGRESS"
 #   destination_ranges = ["0.0.0.0/0"]
 # }
-
-resource "google_compute_firewall" "allow-obot" {
-  name    = "allow-obot"
-  network = google_compute_network.my-vpc.name
-
-  allow {
-    protocol = "tcp"
-    ports    = ["30000", "30001"]
-  }  
-
-  direction = "INGRESS"
-  source_ranges = ["0.0.0.0/0"]
-}

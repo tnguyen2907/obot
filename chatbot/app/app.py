@@ -60,17 +60,19 @@ with st.sidebar:
     st.markdown("This chatbot uses data from Oberlin College's website and catalog to answer questions.")
     st.markdown("---")
     st.markdown("### 💡 **Tips**")
-    st.markdown("- **Be specific** in your questions (especially if they are time-sensitive.)")
+    st.markdown("- **Be specific** in your questions *(especially if they are time-sensitive.)*")
     st.markdown("- **Start a new conversation** if the chatbot repeatedly fails to answer your questions.")
     st.markdown("- **Rephrasing questions** may help the chatbot retrieve better results *(e.g. P/NP may work better than Pass/No Pass.)*")
 
 def fix_markdown(text):
     return text.replace("$", "\$")
 
+# Display chat history
 for message in st.session_state["chatbot"].get_chat_history():
     with st.chat_message(message["role"]):
         st.markdown(fix_markdown(message["content"]))
 
+# Main chatbot logic
 if len(st.session_state["chatbot"].get_chat_history()) < MAX_MESSAGES_IN_ONE_CONVERSATION:
     if input := st.chat_input("Ask a question about Oberlin College"):
         chatbot_state = read_state()
@@ -90,12 +92,12 @@ if len(st.session_state["chatbot"].get_chat_history()) < MAX_MESSAGES_IN_ONE_CON
             else:
                 st.chat_message("assistant").markdown(fix_markdown(response['answer']))
                 st.rerun()
-                # print_sources(response['context'])
         else:
             st.markdown("*Sorry, the weekly request limit has been reached.* 😭 Please try again next week")
 else:
     st.markdown("*Sorry, this conversation has reached the maximum number of messages.*  😪 *Please start a new conversation.*")
 
+# Clear chat history button
 if len(st.session_state["chatbot"].get_chat_history()) > 1:
     clear_history = st.button("Clear chat history")
     if clear_history:

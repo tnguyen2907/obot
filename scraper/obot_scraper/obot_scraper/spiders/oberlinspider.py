@@ -20,6 +20,7 @@ class OberlinspiderSpider(scrapy.Spider):
     }
 
     def parse(self, response):
+        # Check if the URL is a file
         if response.url.endswith(('.pdf', '.docx', '.pptx', '.xlsx')) or response.url.startswith(("https://drive.google.com", "https://drive.usercontent.google.com")):
             if response.url.startswith("https://drive.google.com"):
                 yield scrapy.Request("https://drive.google.com/uc?export=download&id=" + response.url.split('/')[5], callback=self.parse, meta={'url': response.url})

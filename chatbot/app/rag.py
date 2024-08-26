@@ -1,4 +1,5 @@
 import os
+from langchain_core.documents import Document
 from langchain_google_firestore import FirestoreVectorStore
 from langchain_google_vertexai import VertexAIEmbeddings
 from langchain_google_vertexai import ChatVertexAI
@@ -41,9 +42,13 @@ class ConversationalRAG:
         def add_source_url(docs):
             for doc in docs:
                 doc.page_content = f"<Source> {doc.metadata['url']}\n{doc.page_content}"
+            # Add academic calendar as a document
+            with open("academic_calendar.txt", "r") as file:
+                academic_calendar = file.read()
+                docs.append(Document(page_content=academic_calendar)) 
             return docs
 
-        retriever = vector_store.as_retriever(search_kwargs={"k": 10}) | add_source_url
+        retriever = vector_store.as_retriever(search_kwargs={"k": 5}) | add_source_url
 
         safety_settings = {
             HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH, 
@@ -51,13 +56,12 @@ class ConversationalRAG:
             HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH, 
             HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         }
-        instruct_llm = ChatVertexAI(
         # instruct_llm = ChatGoogleGenerativeAI(
+        instruct_llm = ChatVertexAI(
             model="gemini-1.5-pro",
-            # model="gemini-1.5-flash-001",
             temperature=0.3,
             max_tokens=256,
-            max_retries=6,
+            max_retries=3,
             # safety_settings=safety_settings
         )
 
@@ -65,7 +69,7 @@ class ConversationalRAG:
             model="gemini-1.5-flash-001",
             temperature=0.7,
             max_tokens=1024,
-            max_retries=6,
+            max_retries=3,
             safety_settings=safety_settings
         )
 
@@ -74,6 +78,7 @@ class ConversationalRAG:
                 raise SafetyException("Chatbot thinks this message is unsafe\n{}".format(ai_message.response_metadata['safety_ratings']))
             return ai_message
 
+        # The prompt to summarize the chat history and create a standalone question for retrieval
         contextualize_question_instruction_prompt = """Given the chat history and the latest user question below, \
 which might reference context in the chat history, formulate a standalone question that can be understood without \
 the chat history. The standalone question will be used to retrieve relevant information.
@@ -102,6 +107,7 @@ Please keep some terms like P/NP as it is if they are better keywords for retrie
 
         history_aware_retriever = create_history_aware_retriever(instruct_llm | llm_output_safety_filter, retriever, self.contextualize_question_prompt)
 
+        #Main prompt for the chatbot
         qa_system_prompt = '''You are a helpful assistant named Obot that answers questions about Oberlin College. \
 Please ensure all interactions are unabiased, polite, professional, supportive and all information is accurate. ANSWER THE QUESTION IN DETAILS.
 The current date is {current_date} and the current time is {current_time}. Evaluate the user's question within this time context. \
@@ -157,9 +163,9 @@ If you use any sources from the context to formulate your answer, list them at t
         )
 
     def get_session_history(self, session_id):
-            if session_id not in self.session_store:
-                self.session_store[session_id] = InMemoryChatMessageHistory(messages=[AIMessage(start_message)])
-            return self.session_store[session_id]
+        if session_id not in self.session_store:
+            self.session_store[session_id] = InMemoryChatMessageHistory(messages=[AIMessage(start_message)])
+        return self.session_store[session_id]
 
     def get_completion(self, input, session_id="default"):
         try:
@@ -182,14 +188,12 @@ If you use any sources from the context to formulate your answer, list them at t
     
     def get_chat_history(self, session_id="default"):
         messages = []
-        source_index = 0
         for message in self.get_session_history(session_id).messages:
             if isinstance(message, HumanMessage):
                 messages.append({"role": "user", "content": message.content})
             elif isinstance(message, AIMessage):
                 if message.content != start_message:
-                    messages.append({"role": "assistant", "content": message.content, "source_index": source_index})
-                    source_index += 1
+                    messages.append({"role": "assistant", "content": message.content})
                 else:
                     messages.append({"role": "assistant", "content": message.content})
         return messages

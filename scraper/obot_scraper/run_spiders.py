@@ -51,13 +51,11 @@ def main():
             "obot_scraper.pipelines.EncodingAndStoringPipeline": 400,
         })
 
-    #create output and logs directories if they don't exist
     os.makedirs("output", exist_ok=True)
     os.makedirs("logs", exist_ok=True)
 
     process = CrawlerProcess(settings)
 
-    # Run multiple spiders in one process
     for spider in args.spiders:
         process.crawl(spider)
 
@@ -70,7 +68,7 @@ def main():
     # Print new URL and encoding stats
     EncodingAndStoringPipeline().print_stats()
 
-    # Upload output files to GCS
+    # Upload output and log files to GCS
     upload_to_gcs("output", "obot-scraper-output", "")
 
     cur_timestamp = datetime.datetime.now().strftime("%Y%m%d")
