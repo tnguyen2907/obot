@@ -1,11 +1,4 @@
 # Have to use envsubst to replace the variables
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: chatbot-sa
-  annotations:
-    iam.gke.io/gcp-service-account: obot-chatbot@$GCP_PROJECT_ID.iam.gserviceaccount.com
----
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:

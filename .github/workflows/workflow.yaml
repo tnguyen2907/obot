@@ -241,8 +241,9 @@ jobs:
         
       - name: Apply Kustomized YAML
         if: env.DRY_RUN == 'false'
-        run: ./kustomize build chatbot/kustomize/overlays/$ENV | envsubst | kubectl apply -f -
-
+        run: |
+          ./kustomize build chatbot/kustomize/overlays/$ENV | envsubst | kubectl apply -f -
+          envsubst < chatbot/kustomize/base/serviceaccount.yaml | kubectl apply -f -
       
   # test-changes:
   #   needs: check-diff

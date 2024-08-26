@@ -1,7 +1,7 @@
 resource "google_firestore_database" "database" {
   provider    = google-beta
   name        = "(default)"
-  location_id = "us-east4"
+  location_id = var.REGION
   type        = "FIRESTORE_NATIVE"
   deletion_policy = "ABANDON"
 
