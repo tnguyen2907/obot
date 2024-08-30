@@ -1,6 +1,6 @@
 # Scrapy spiders for web crawling
 
-![Scrapy workflow](https://github.com/tnguyen2907/obot/tree/master/documentation/scrapy-workflow.png)
+![Scrapy workflow](https://github.com/tnguyen2907/obot/tree/master/documentation/assets/scrapy-workflow.png)
 
 This repository contains a Scrapy project that scrapes data from the [Oberlin College website](https://www.oberlin.edu) and [catalog](https://www.catalog.oberlin.edu). The scraper processes all HTML and files, encodes the data, and stores it in **Firestore** for efficient vector-based retrieval by the chatbot. All spiders are deployed on **Cloud Run** and scheduled to run daily with **Cloud Scheduler** to keep the chatbot updated with the latest information.
 
