@@ -67,7 +67,7 @@ MIN_CHUNK_SIZE = 128
 MAX_CHUNK_SIZE = 512
 MAX_CHARACTERS_PER_CHUNK = 3000
 
-# Modified from source code https://github.com/langchain-ai/langchain/blob/master/libs/text-splitters/langchain_text_splitters/html.py
+# Modified from source code https://github.com/langchain-ai/langchain/blob/libs/text-splitters/langchain_text_splitters/html.py
 # Transform original HTML using XSLT to add headers and chunks.
 def split_html_by_header(html):
     parser = etree.HTMLParser()

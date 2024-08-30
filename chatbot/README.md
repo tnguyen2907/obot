@@ -1,5 +1,5 @@
 # Chatbot application
-![Chatbot App Workflow](https://github.com/tnguyen2907/obot/tree/master/documentation/assets/chatbot-workflow.png)
+![Chatbot App Workflow](https://github.com/tnguyen2907/obot/tree/documentation/assets/chatbot-workflow.png)
 
 **Backend:** The app leverages **Langchain** for its RAG architecture and conversational capabilities.
 - For each user query, the chatbot summarizes the entire conversation into a standalone question to enhance vector retrieval from the **Firestore**, improving the relevance of retrieved information.
