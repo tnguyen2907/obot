@@ -1,0 +1,11 @@
+env: dev
+replicas: 1
+strategy:
+  type: Recreate
+tolerations:
+  - key: "env"
+    operator: "Equal"
+    value: "dev"
+    effect: "NoSchedule"
+
+nodePort: 30001
