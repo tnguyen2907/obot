@@ -239,7 +239,7 @@ jobs:
         if: env.GKE_DRY_RUN == 'false'
         run: |
           cd chatbot
-          helm upgrade --install chatbot helm --values helm/values/values-$ENV.yaml --set image=$IMAGE_WITH_DIGEST,gcp_project_id=$GCP_PROJECT_ID --dry-run --debug
+          helm upgrade --install chatbot helm --values helm/values/values-$ENV.yaml --set image=$IMAGE_WITH_DIGEST,gcp_project_id=$GCP_PROJECT_ID
 
       # - name: Set up Kustomize
       #   run: |-
