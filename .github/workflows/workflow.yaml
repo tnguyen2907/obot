@@ -11,13 +11,13 @@ env:
 
   ENV: ${{ (github.ref_name == 'master' && 'prod') || 'dev' }}
   SCRAPER_VERSION: "v0.0.1"
-  CHATBOT_VERSION: "v0.0.0"
+  CHATBOT_VERSION: "v0.0.1"
 
   GKE_CLUSTER: "primary"
   GKE_ZONE: "us-east1-b"
 
   TF_DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'true' }}
-  GKE_DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'false' }}
+  GKE_DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'true' }}
 
 jobs:
   check-diff:
@@ -241,28 +241,7 @@ jobs:
           cd chatbot
           helm upgrade --install chatbot helm --values helm/values/values-$ENV.yaml --set image=$IMAGE_WITH_DIGEST,gcp_project_id=$GCP_PROJECT_ID
 
-      # - name: Set up Kustomize
-      #   run: |-
-      #     curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomiz e_3.1.0_linux_amd64
-      #     chmod u+x ./kustomize
 
-      # - name: Echo YAML
-      #   run: |
-      #     cd chatbot/kustomize/overlays/$ENV
-      #     sed -i "s|$IMAGE_IN_USE|$IMAGE_WITH_DIGEST|g" deployment.yaml
-      #     echo "Kustomized YAML:"
-      #     ../../../../kustomize build . | envsubst
-      #     echo "Shared YAML:"
-      #     envsubst < ../../base/serviceaccount.yaml
-        
-      # - name: Deploy to GKE
-      #   if: env.DRY_RUN == 'false'
-      #   run: |
-      #     echo "Kustomized components:"
-      #     ./kustomize build chatbot/kustomize/overlays/$ENV | envsubst | kubectl apply -f -
-      #     echo "Shared components:"
-      #     envsubst < chatbot/kustomize/base/serviceaccount.yaml | kubectl apply -f -
-      
   # test-changes:
   #   needs: check-diff
   #   name: Test changes
