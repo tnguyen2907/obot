@@ -16,7 +16,8 @@ env:
   GKE_CLUSTER: "primary"
   GKE_ZONE: "us-east1-b"
 
-  DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'true' }}
+  TF_DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'true' }}
+  GKE_DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'true' }}
 
 jobs:
   check-diff:
@@ -179,13 +180,13 @@ jobs:
           echo "TF_VAR_ENV=$ENV" >> $GITHUB_ENV
 
       - name: Terraform Plan
-        if: env.DRY_RUN == 'true'
+        if: env.TF_DRY_RUN == 'true'
         run: |
           cd terraform
           terraform plan
 
       - name: Terraform Apply
-        if: env.DRY_RUN == 'false'
+        if: env.TF_DRY_RUN == 'false'
         run: |
           cd terraform
           terraform apply -auto-approve
@@ -219,35 +220,48 @@ jobs:
       - name: Get digest image in-use from Artifact Registry
         id: get-digest
         run: |
-          echo "IMAGE_IN_USE=$REGION-docker.pkg.dev/\$GCP_PROJECT_ID/obot-$ENV/chatbot:in-use"
-          echo "IMAGE_IN_USE=$REGION-docker.pkg.dev/\$GCP_PROJECT_ID/obot-$ENV/chatbot:in-use" >> $GITHUB_ENV
           IMAGE_WITH_DIGEST=$(curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
           "https://artifactregistry.us-east1.rep.googleapis.com/v1/projects/$GCP_PROJECT_ID/locations/us-east1/repositories/obot-$ENV/dockerImages" | \
           jq -r '.dockerImages[] | select(.tags[] | contains("in-use")) | select(.uri | contains("chatbot")) | .uri')
           echo "Image with digest: $IMAGE_WITH_DIGEST"
           echo "IMAGE_WITH_DIGEST=$IMAGE_WITH_DIGEST" >> $GITHUB_ENV
-
-      - name: Set up Kustomize
-        run: |-
-          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
-          chmod u+x ./kustomize
+        
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.2.0
 
       - name: Echo YAML
         run: |
-          cd chatbot/kustomize/overlays/$ENV
-          sed -i "s|$IMAGE_IN_USE|$IMAGE_WITH_DIGEST|g" deployment.yaml
-          echo "Kustomized YAML:"
-          ../../../../kustomize build . | envsubst
-          echo "Shared YAML:"
-          envsubst < ../../base/serviceaccount.yaml
-        
+          cd chatbot
+          helm lint helm --values helm/values/values-$ENV.yaml --set image=$IMAGE_WITH_DIGEST,gcp_project_id=$GCP_PROJECT_ID
+          helm template helm --values helm/values/values-$ENV.yaml --set image=$IMAGE_WITH_DIGEST,gcp_project_id=$GCP_PROJECT_ID
+      
       - name: Deploy to GKE
-        if: env.DRY_RUN == 'false'
+        if: env.GKE_DRY_RUN == 'false'
         run: |
-          echo "Kustomized components:"
-          ./kustomize build chatbot/kustomize/overlays/$ENV | envsubst | kubectl apply -f -
-          echo "Shared components:"
-          envsubst < chatbot/kustomize/base/serviceaccount.yaml | kubectl apply -f -
+          cd chatbot
+          helm upgrade --install chatbot helm --values helm/values/values-$ENV.yaml --set image=$IMAGE_WITH_DIGEST,gcp_project_id=$GCP_PROJECT_ID --dry-run --debug
+
+      # - name: Set up Kustomize
+      #   run: |-
+      #     curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomiz e_3.1.0_linux_amd64
+      #     chmod u+x ./kustomize
+
+      # - name: Echo YAML
+      #   run: |
+      #     cd chatbot/kustomize/overlays/$ENV
+      #     sed -i "s|$IMAGE_IN_USE|$IMAGE_WITH_DIGEST|g" deployment.yaml
+      #     echo "Kustomized YAML:"
+      #     ../../../../kustomize build . | envsubst
+      #     echo "Shared YAML:"
+      #     envsubst < ../../base/serviceaccount.yaml
+        
+      # - name: Deploy to GKE
+      #   if: env.DRY_RUN == 'false'
+      #   run: |
+      #     echo "Kustomized components:"
+      #     ./kustomize build chatbot/kustomize/overlays/$ENV | envsubst | kubectl apply -f -
+      #     echo "Shared components:"
+      #     envsubst < chatbot/kustomize/base/serviceaccount.yaml | kubectl apply -f -
       
   # test-changes:
   #   needs: check-diff

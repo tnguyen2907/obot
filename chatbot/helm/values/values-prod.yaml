@@ -1,0 +1,18 @@
+env: prod
+replicas: 1
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+tolerations:
+  - key: "env"
+    operator: "Equal"
+    value: "prod"
+    effect: "NoSchedule"
+  - key: "env"
+    operator: "Equal"
+    value: "prod"
+    effect: "PreferNoSchedule"
+
+nodePort: 30000

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot-deployment-{{ .Values.env }}
+  namespace: default
+  labels:
+    app: chatbot-{{ .Values.env }}
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    {{- toYaml .Values.strategy | nindent 4 }}  
+  selector:
+    matchLabels:
+      app: chatbot-{{ .Values.env }}
+  template:
+    metadata:
+      labels:
+        app: chatbot-{{ .Values.env }}
+    spec:
+      serviceAccountName: chatbot-sa-{{ .Values.env }}
+      containers:
+      - name: chatbot
+        image: {{ .Values.image }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8501
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: env
+                operator: In
+                values:
+                - {{ .Values.env }}
