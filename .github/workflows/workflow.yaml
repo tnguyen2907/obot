@@ -46,6 +46,7 @@ jobs:
             chatbot:
               - 'chatbot/**'
               - '!chatbot/helm/**'
+              - '!chatbot/README.md'
             terraform:
               - 'terraform/**'
               - '!terraform/README.md'
