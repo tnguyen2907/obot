@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatbot-deployment-{{ .Values.env }}
-  namespace: default
+  name: chatbot-deployment
+  namespace: {{ .Values.env }}
   labels:
-    app: chatbot-{{ .Values.env }}
+    app: chatbot
 spec:
   replicas: {{ .Values.replicas }}
   strategy:
     {{- toYaml .Values.strategy | nindent 4 }}  
   selector:
     matchLabels:
-      app: chatbot-{{ .Values.env }}
+      app: chatbot
   template:
     metadata:
       labels:
-        app: chatbot-{{ .Values.env }}
+        app: chatbot
     spec:
-      serviceAccountName: chatbot-sa-{{ .Values.env }}
+      serviceAccountName: chatbot-sa
       containers:
       - name: chatbot
         image: {{ .Values.image }}

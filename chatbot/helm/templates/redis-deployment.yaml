@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-deployment-{{ .Values.env }}
-  namespace: default
+  name: redis-deployment
+  namespace: {{ .Values.env }}
   labels:
-    app: redis-{{ .Values.env }}
+    app: redis
 spec:
   replicas: 1
   strategy:
     {{- toYaml .Values.strategy | nindent 4 }}
   selector:
     matchLabels:
-      app: redis-{{ .Values.env }}
+      app: redis
   template:
     metadata:
       labels:
-        app: redis-{{ .Values.env }}
+        app: redis
     spec:
       containers:
       - name: redis
