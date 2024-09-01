@@ -37,7 +37,7 @@ next_reset_date = datetime.now(timezone(timedelta(hours=-4))).replace(hour=0, mi
 num_requests = 0
 
 if chatbot_state is None:
-    chatbot_state = {"num_requests": 0, "next_reset_date": next_reset_date.isoformat()}
+    chatbot_state = {"num_requests": 0, "next_reset_date": next_reset_date}
     write_state(chatbot_state)
 else:
     state_updated = False
