@@ -9,5 +9,3 @@ The workflow is as follows:
 - The retrieved content is processed, transformed in to text, cleaned, chunked into smaller pieces for efficient retrieval.
 - If the data doesn't exist in Firestore or has been updated, it is encoded then added in Firestore.
 - After the spider has finished crawling, the log and output are stored in Cloud Storage for monitoring and debugging purposes.
-
-For deployment to CLoud Run, please refer to 
