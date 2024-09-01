@@ -12,7 +12,7 @@ This repository contains four major components:
 
 ## 1. Chatbot App
 
-The chatbot's backend uses **Langchain** for its RAG architecture and conversational capabilities, while the frontend is built with **Streamlit**. It retrieves relevant information through vector-retrieval in **Firestore** to provide context-aware responses. The chatbot is deployed on GCP using **Google Kubernetes Engine (GKE)**, ensuring scalability and reliability.
+The chatbot's backend uses **Langchain** for its RAG architecture and conversational capabilities, with **Streamlit** for front end, and **Redis** for database. It retrieves relevant information through vector-retrieval in **Firestore** to provide context-aware responses. The chatbot is deployed on GCP using **Google Kubernetes Engine (GKE)**, ensuring scalability and reliability.
 
 ![Chatbot App Workflow](assets/chatbot-workflow.png)
 
