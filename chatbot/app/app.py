@@ -12,7 +12,7 @@ if "chatbot" not in st.session_state:
     st.session_state["chatbot"] = ConversationalRAG()
 
 # Initialize Redis client
-redis_client = redis.Redis(host="redis", port=6379, db=0, decode_responses=True)
+redis_client = redis.Redis(host="redis-service-dev", port=6379, db=0, decode_responses=True)
 
 # Read state from redis
 def read_state():
