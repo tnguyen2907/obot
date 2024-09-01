@@ -41,7 +41,6 @@ if chatbot_state is None:
     write_state(chatbot_state)
 else:
     state_updated = False
-    chatbot_state["next_reset_date"] = datetime.fromisoformat(chatbot_state["next_reset_date"])
     if "next_reset_date" not in chatbot_state:
         chatbot_state["next_reset_date"] = next_reset_date
         state_updated = True
