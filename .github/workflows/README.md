@@ -16,8 +16,11 @@ The pipeline is secured using **Workload Identity Federation** for authenticatio
 ## Helm Chart
 The Helm chart for deploying the chatbot application on GKE is located in the `chatbot/helm` directory and includes the following files in the template:
 
-- **`deployment.yaml`**: Defines the deployment configuration for the chatbot, which includes basic configurations with specific strategy, tolerations, and affinity rules for efficient and high-availability deployment.
-- **`service.yaml`**: Configures the service to expose the application using NodePort.
+- **`chatbot-deployment.yaml`**: Defines the deployment configuration for the chatbot, which includes basic configurations with specific strategy, tolerations, and affinity rules for efficient and high-availability deployment.
+- **`chatbot-service.yaml`**: Configures the service to expose the application using NodePort.
 - **`serviceaccount.yaml`**: Sets up a service account to authenticate the chatbot with GCP services using Workload Identity Federation.
+- **`redis-deployment.yaml`**: Deploys a Redis instance for state management with persistent storage.
+- **`redis-service.yaml`**: ClusterIP service for chatbot application to connect 
+- **`redis-pvc.yaml`**: Persistent Volume Claim for Redis data persistence.
 
 Environment-specific variables for development and production are stored in the `values` directory.

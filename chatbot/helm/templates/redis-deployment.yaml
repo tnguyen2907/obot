@@ -1,29 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatbot-deployment-{{ .Values.env }}
-  namespace: default
+  name: redis-deployment
+  namespace: {{ .Values.env }}
   labels:
-    app: chatbot-{{ .Values.env }}
+    app: redis
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: 1
   strategy:
-    {{- toYaml .Values.strategy | nindent 4 }}  
+    {{- toYaml .Values.strategy | nindent 4 }}
   selector:
     matchLabels:
-      app: chatbot-{{ .Values.env }}
+      app: redis
   template:
     metadata:
       labels:
-        app: chatbot-{{ .Values.env }}
+        app: redis
     spec:
-      serviceAccountName: chatbot-sa-{{ .Values.env }}
       containers:
-      - name: chatbot
-        image: {{ .Values.image }}
+      - name: redis
+        image: redis:7.4.0-alpine
         imagePullPolicy: Always
         ports:
-        - containerPort: 8501
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
       affinity:

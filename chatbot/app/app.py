@@ -1,39 +1,46 @@
 import streamlit as st
 from datetime import datetime, timedelta, timezone
 import os
-import json
+import redis
 
 from rag import ConversationalRAG, start_message
 
 MAX_MESSAGES_IN_ONE_CONVERSATION = 12
 MAX_REQUESTS_WEEKLY = 50
-STATE_FILE = "chatbot_state.json"
 
 if "chatbot" not in st.session_state:
     st.session_state["chatbot"] = ConversationalRAG()
 
-# Read state from the file
+# Initialize Redis client
+redis_client = redis.Redis(host="redis-service", port=6379, db=0, decode_responses=True)
+
+# Read state from redis
 def read_state():
-    if os.path.exists(STATE_FILE):
-        with open(STATE_FILE, "r") as f:
-            return json.load(f)
+    num_requests = redis_client.get("num_requests")
+    next_reset_date = redis_client.get("next_reset_date")
+    
+    if num_requests is not None and next_reset_date is not None:
+        return {
+            "num_requests": int(num_requests),  # Convert num_requests back to integer
+            "next_reset_date": datetime.fromisoformat(next_reset_date)  # Convert back to datetime
+        }
     return None
 
-#Write state to the file
+#Write state to redis
 def write_state(state):
-    with open(STATE_FILE, "w") as f:
-        json.dump(state, f)
+    redis_client.set("num_requests", state["num_requests"])
+    redis_client.set("next_reset_date", state["next_reset_date"].isoformat())
 
 # Initialize or update app state from the local file
 chatbot_state = read_state()
 next_reset_date = datetime.now(timezone(timedelta(hours=-4))).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=datetime.now(timezone(timedelta(hours=-4))).weekday()) + timedelta(days=7)
 num_requests = 0
+
 if chatbot_state is None:
-    chatbot_state = {"num_requests": 0, "next_reset_date": next_reset_date.isoformat()}
+    chatbot_state = {"num_requests": 0, "next_reset_date": next_reset_date}
     write_state(chatbot_state)
 else:
     state_updated = False
-    chatbot_state["next_reset_date"] = datetime.fromisoformat(chatbot_state["next_reset_date"])
     if "next_reset_date" not in chatbot_state:
         chatbot_state["next_reset_date"] = next_reset_date
         state_updated = True
@@ -44,7 +51,6 @@ else:
         chatbot_state["next_reset_date"] = next_reset_date
         state_updated = True
     if state_updated:
-        chatbot_state["next_reset_date"] = chatbot_state["next_reset_date"].isoformat()
         write_state(chatbot_state)
 
 st.title("Obot: Oberlin Chatbot")
