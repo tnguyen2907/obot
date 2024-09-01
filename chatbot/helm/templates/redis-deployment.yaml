@@ -23,6 +23,13 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
       affinity:
