@@ -42,11 +42,14 @@ jobs:
           filters: |
             scraper:
               - 'scraper/**'
+              - '!scraper/README.md'
             chatbot:
               - 'chatbot/**'
               - '!chatbot/helm/**'
+              - '!chatbot/README.md'
             terraform:
               - 'terraform/**'
+              - '!terraform/README.md'
 
   build-and-publish-scraper:
     needs: check-diff
