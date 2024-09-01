@@ -40,7 +40,7 @@ The **GitHub Actions** CI/CD pipeline automates the entire deployment process. I
 
 ![CI/CD workflow](assets/cicd-workflow.png)
 
-For more details, see the [CI/CD pipeline README](.github/README.md).
+For more details, see the [CI/CD pipeline README](.github/workflows/README.md).
 
 *Note:* Another significant aspect of this project has been setting up authentication for various GCP services using IAM roles, service accounts, and workload identity federation. These configurations were managed through `gcloud` scripts (but not included in this repository).
 

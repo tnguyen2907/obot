@@ -8,4 +8,4 @@
 
 **Frontend:** The app is built with **Streamlit** 
 
-**Deployment:** The chatbot is deployed on **Google Kubernetes Engine (GKE)** via a **Helm** chart. For more details, see the [CI/CD pipeline README](../.github/README.md).
+**Deployment:** The chatbot is deployed on **Google Kubernetes Engine (GKE)** via a **Helm** chart. For more details, see the [CI/CD pipeline README](../.github/workflows/README.md).

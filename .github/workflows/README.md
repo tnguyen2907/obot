@@ -1,5 +1,5 @@
 # CI/CD Pipeline with GitHub Actions
-![CI/CD pipeline via GitHub Actions](../assets/cicd-workflow.png)
+![CI/CD pipeline via GitHub Actions](../../assets/cicd-workflow.png)
 
 The CI/CD pipeline is built with **GitHub Actions** and triggers on every commit. For commits to the `master` branch, the pipeline deploys changes to the `prod` environment. Commits to any other branch trigger deployment to the `dev` environment.
 
