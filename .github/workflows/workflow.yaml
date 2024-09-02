@@ -2,8 +2,7 @@ name: Obot CI/CD
 
 on:
   push:
-  workflow_call:
-    
+  workflow_dispatch:    
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
