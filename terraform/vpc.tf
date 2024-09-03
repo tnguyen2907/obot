@@ -31,7 +31,7 @@ resource "google_compute_firewall" "allow-obot" {
 
   allow {
     protocol = "tcp"
-    ports    = ["30000", "30001"]
+    ports    = ["30000", "30001", "80", "443"]
   }  
 
   direction = "INGRESS"
