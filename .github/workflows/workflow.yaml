@@ -18,7 +18,7 @@ env:
   GKE_ZONE: "us-east1-b"
 
   TF_DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'true' }}
-  GKE_DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'false' }}
+  GKE_DRY_RUN: ${{ (github.ref_name == 'master' && 'false') || 'true' }}
 
 jobs:
   check-diff:

@@ -42,5 +42,7 @@ The **GitHub Actions** CI/CD pipeline automates the entire deployment process. I
 
 For more details, see the [CI/CD pipeline README](.github/workflows/README.md).
 
-*Note:* Another significant aspect of this project has been setting up authentication for various GCP services using IAM roles, service accounts, and workload identity federation. These configurations were managed through `gcloud` scripts (but not included in this repository).
+*Note: There are two other significant aspects of the project that is not included in this repo:* 
+- **Nginx** load balancer for the chatbot application: Leveraging GCP's free tier of an e2-mirco instance with free public IP, I set up an Nginx load balancer to route traffic to the node port of the chatbot application. SSL certificates renewal was also set up using **certbot (and Let's Encrypt)** to enable **HTTPS**.
+ - Authentication for various GCP services using IAM roles, service accounts, and workload identity federation. These configurations were managed through `gcloud` scripts.
 
