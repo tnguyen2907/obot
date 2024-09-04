@@ -5,6 +5,12 @@ import redis
 
 from rag import ConversationalRAG, start_message
 
+# Set page configurationq
+st.set_page_config(
+    page_title="Obot: Oberlin Chatbot",
+    page_icon="🤖"
+)
+
 MAX_MESSAGES_IN_ONE_CONVERSATION = 12
 MAX_REQUESTS_WEEKLY = 50
 
