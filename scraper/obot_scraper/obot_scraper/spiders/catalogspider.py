@@ -4,6 +4,7 @@ from urllib.parse import urljoin, urlparse, parse_qs, urlunparse, urlencode
 from obot_scraper.items import WebsiteItem
 
 CATALOG_ID = '52'
+EXCO_CATALOG_ID = '54'
 
 class CatalogspiderSpider(scrapy.Spider):
     name = "catalogspider"
@@ -57,7 +58,7 @@ class CatalogspiderSpider(scrapy.Spider):
 
             # Check if 'catoid' is 52
             query_params = parse_qs(cleaned_query_params)
-            if 'catoid' in query_params and query_params['catoid'][0] == CATALOG_ID:
+            if 'catoid' in query_params and query_params['catoid'][0] in [CATALOG_ID, EXCO_CATALOG_ID]:
                 # Filter out already visited URLs and ensure the URL starts with the desired prefix
                 if cleaned_url.startswith("https://catalog.oberlin.edu/") and cleaned_url not in self.visited_urls:
                     self.visited_urls.add(cleaned_url) 

@@ -5,6 +5,7 @@ import argparse
 import os
 from google.cloud import storage
 import datetime
+import logging
 
 from obot_scraper.pipelines import EncodingAndStoringPipeline
 
@@ -36,7 +37,7 @@ def main():
     parser.add_argument('spiders', nargs='+', choices=['blogspider', 'bulletinspider', 'catalogspider', 'eventspider', 'newsspider', 'oberlinspider', "debugspider"], help="Names of the spiders to run")
     parser.add_argument('-ll', '--loglevel', default='INFO', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help="Log level")
     parser.add_argument('-lf', '--logfile', default='logs/spiders.log', help="Log file path")
-    parser.add_argument('--dryrun', action='store_true', help="Run spiders without adding items to Firestore (disables EncodingAndStoringPipeline)")
+    parser.add_argument('--dry-run', action='store_true', help="Run spiders without adding items to Firestore (disables EncodingAndStoringPipeline)")
 
     args = parser.parse_args()
 
@@ -45,7 +46,7 @@ def main():
     if len(args.spiders) > 1:
         settings.set("LOG_FILE", args.logfile)
 
-    if not args.dryrun:
+    if not args.dry_run:
         settings.set("ITEM_PIPELINES", {
             "obot_scraper.pipelines.CleaningAndChunkingPipeline": 300,
             "obot_scraper.pipelines.EncodingAndStoringPipeline": 400,
@@ -65,14 +66,17 @@ def main():
 
     print("All spiders have finished")
 
-    # Print new URL and encoding stats
-    EncodingAndStoringPipeline().print_stats()
+    if not args.dry_run:
+        # Print new URL and encoding stats
+        EncodingAndStoringPipeline().print_stats()
 
-    # Upload output and log files to GCS
-    upload_to_gcs("output", "obot-scraper-output", "")
+        # Upload output and log files to GCS
+        upload_to_gcs("output", "obot-scraper-output", "")
 
-    cur_timestamp = datetime.datetime.now().strftime("%Y%m%d")
-    upload_to_gcs("logs", "obot-scraper-logs", f"logs-{cur_timestamp}")
+        cur_timestamp = datetime.datetime.now().strftime("%Y%m%d")
+        upload_to_gcs("logs", "obot-scraper-logs", f"logs-{cur_timestamp}")
+    else:
+        logging.info("This is a dry run. No items were added to Firestore.")
 
 
 if __name__ == "__main__":
