@@ -10,4 +10,4 @@ COPY ./obot_scraper /obot_scraper
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "run_spiders.py", "eventspider", "--dryrun"]
+CMD ["python", "run_spiders.py", "eventspider", "--dry-run"]
