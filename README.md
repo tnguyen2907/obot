@@ -1,6 +1,6 @@
 # Obot
 
-**Obot** is a conversational AI chatbot designed to answer questions about Oberlin College. Leveraging the Retrieval-Augmented Generation (RAG) model, the chatbot uses data scraped from the college's website to provide provides accurate and context-specific responses to user queries. The application is hosted on Google Cloud Platform (GCP) and is publicly accessible at https://obiebot.com.
+**Obot** is a conversational AI chatbot designed to answer questions about Oberlin College. Leveraging the Retrieval-Augmented Generation (RAG) model, the chatbot uses data scraped from the college's website to provide provides accurate and context-specific responses to user queries. The application is hosted on Google Cloud Platform (GCP) and is publicly accessible at https://obiebot.com or http://35.196.25.146:30000/
 
 ![Chatbot App Demo](assets/chatbot-app-demo.gif)
 
