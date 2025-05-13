@@ -1,5 +1,5 @@
 resource "google_compute_instance" "prod_chatbot_instance" {
-  name         = "prod_chatbot-instance"
+  name         = "prod-chatbot-instance"
   machine_type = "e2-micro"
 
   boot_disk {
@@ -37,7 +37,7 @@ resource "google_compute_instance" "prod_chatbot_instance" {
 
 resource "google_compute_instance" "dev_chatbot_instance" {
   count = var.ENV == "dev" ? 1 : 0
-  name         = "dev_chatbot-instance"
+  name         = "dev-chatbot-instance"
   machine_type = "e2-micro"
 
   boot_disk {
