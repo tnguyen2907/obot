@@ -1,6 +1,7 @@
 resource "google_compute_instance" "prod_chatbot_instance" {
   name         = "prod-chatbot-instance"
   machine_type = "e2-micro"
+  zone         = "${var.REGION}-a"
 
   boot_disk {
     initialize_params {
@@ -19,8 +20,8 @@ resource "google_compute_instance" "prod_chatbot_instance" {
   }
 
   service_account {
-    email = "obot-chatbot@${var.GCP_PROJECT_ID}.iam.gserviceaccount.com"
-    scopes = ["cloud-platform"]      
+    email  = "obot-chatbot@${var.GCP_PROJECT_ID}.iam.gserviceaccount.com"
+    scopes = ["cloud-platform"]
   }
 
   allow_stopping_for_update = true
@@ -29,16 +30,18 @@ resource "google_compute_instance" "prod_chatbot_instance" {
     "${path.module}/vm_startup.sh",
     {
       gcp_project_id = var.GCP_PROJECT_ID
-      region     = var.REGION
-      env        = "prod"
+      region         = var.REGION
+      env            = "prod"
     }
   )
 }
 
 resource "google_compute_instance" "dev_chatbot_instance" {
   count = var.ENV == "dev" ? 1 : 0
+
   name         = "dev-chatbot-instance"
   machine_type = "e2-micro"
+  zone         = "${var.REGION}-a"
 
   boot_disk {
     initialize_params {
@@ -57,8 +60,8 @@ resource "google_compute_instance" "dev_chatbot_instance" {
   }
 
   service_account {
-    email = "obot-chatbot@${var.GCP_PROJECT_ID}.iam.gserviceaccount.com"
-    scopes = ["cloud-platform"]      
+    email  = "obot-chatbot@${var.GCP_PROJECT_ID}.iam.gserviceaccount.com"
+    scopes = ["cloud-platform"]
   }
 
   allow_stopping_for_update = true
@@ -67,8 +70,8 @@ resource "google_compute_instance" "dev_chatbot_instance" {
     "${path.module}/vm_startup.sh",
     {
       gcp_project_id = var.GCP_PROJECT_ID
-      region     = var.REGION
-      env        = "dev"
+      region         = var.REGION
+      env            = "dev"
     }
   )
 }
