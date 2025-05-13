@@ -31,7 +31,7 @@ docker network create app-network || true
 echo "[$(date)] Pulling and running app containers"
 
 IMAGE="${region}-docker.pkg.dev/${gcp_project_id}/obot-${env}/chatbot:in-use"
-echo "[$(date)] Will run image: ${IMAGE}"
+echo "[$(date)] Will run image: $IMAGE"
 
 docker pull $IMAGE
 docker run -d --restart=always --name chatbot --network app-network $IMAGE
