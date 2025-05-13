@@ -1,7 +1,9 @@
 import streamlit as st
 from datetime import datetime, timedelta, timezone
 import os
-import redis
+import json
+from filelock import FileLock, Timeout
+from contextlib import contextmanager
 
 from rag import ConversationalRAG, start_message
 
@@ -11,53 +13,64 @@ st.set_page_config(
     page_icon="🤖"
 )
 
+STATE_FILE = "chatbot_state.json"
 MAX_MESSAGES_IN_ONE_CONVERSATION = 12
 MAX_REQUESTS_WEEKLY = 50
 
 if "chatbot" not in st.session_state:
     st.session_state["chatbot"] = ConversationalRAG()
 
-# Initialize Redis client
-redis_client = redis.Redis(host="redis-service", port=6379, db=0, decode_responses=True)
-
-# Read state from redis
+# Read state from the file
 def read_state():
-    num_requests = redis_client.get("num_requests")
-    next_reset_date = redis_client.get("next_reset_date")
-    
-    if num_requests is not None and next_reset_date is not None:
-        return {
-            "num_requests": int(num_requests),  # Convert num_requests back to integer
-            "next_reset_date": datetime.fromisoformat(next_reset_date)  # Convert back to datetime
-        }
-    return None
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, "r") as f:
+            return json.load(f)
+    else:
+        # If the file doesn't exist, create it
+        with open(STATE_FILE, "w") as f:
+            json.dump({}, f)
+        return None
 
-#Write state to redis
+#Write state to the file
 def write_state(state):
-    redis_client.set("num_requests", state["num_requests"])
-    redis_client.set("next_reset_date", state["next_reset_date"].isoformat())
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f)
 
-# Initialize or update app state from the local file
-chatbot_state = read_state()
-next_reset_date = datetime.now(timezone(timedelta(hours=-4))).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=datetime.now(timezone(timedelta(hours=-4))).weekday()) + timedelta(days=7)
-num_requests = 0
+# mutex
+lock = FileLock(STATE_FILE + ".lock", timeout=10) 
 
-if chatbot_state is None:
-    chatbot_state = {"num_requests": 0, "next_reset_date": next_reset_date}
-    write_state(chatbot_state)
-else:
-    state_updated = False
-    if "next_reset_date" not in chatbot_state:
-        chatbot_state["next_reset_date"] = next_reset_date
-        state_updated = True
-    if "num_requests" in chatbot_state:
-        num_requests = chatbot_state["num_requests"]  # Temporary num_requests for display
-    if "num_requests" not in chatbot_state or datetime.now(timezone(timedelta(hours=-4))) > chatbot_state["next_reset_date"]:
-        chatbot_state["num_requests"] = 0
-        chatbot_state["next_reset_date"] = next_reset_date
-        state_updated = True
-    if state_updated:
+@contextmanager
+def lock_with_timeout():
+    try:
+        with lock:
+            yield
+    except Timeout:
+        st.error("🔒 Obot is busy; please refresh the page and try again in a few seconds")
+        st.stop()
+
+# Initialize or update app state from the local file  
+with lock_with_timeout():
+    chatbot_state = read_state()
+    next_reset_date = datetime.now(timezone(timedelta(hours=-4))).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=datetime.now(timezone(timedelta(hours=-4))).weekday()) + timedelta(days=7)
+    num_requests = 0
+    if chatbot_state is None:
+        chatbot_state = {"num_requests": 0, "next_reset_date": next_reset_date.isoformat()}
         write_state(chatbot_state)
+    else:
+        state_updated = False
+        chatbot_state["next_reset_date"] = datetime.fromisoformat(chatbot_state["next_reset_date"])
+        if "next_reset_date" not in chatbot_state:
+            chatbot_state["next_reset_date"] = next_reset_date
+            state_updated = True
+        if "num_requests" in chatbot_state:
+            num_requests = chatbot_state["num_requests"]  # Temporary num_requests for display
+        if "num_requests" not in chatbot_state or datetime.now(timezone(timedelta(hours=-4))) > chatbot_state["next_reset_date"]:
+            chatbot_state["num_requests"] = 0
+            chatbot_state["next_reset_date"] = next_reset_date
+            state_updated = True
+        if state_updated:
+            chatbot_state["next_reset_date"] = chatbot_state["next_reset_date"].isoformat()
+            write_state(chatbot_state)
 
 st.title("Obot: Oberlin Chatbot")
 
@@ -83,18 +96,24 @@ def fix_markdown(text):
 for message in st.session_state["chatbot"].get_chat_history():
     with st.chat_message(message["role"]):
         st.markdown(fix_markdown(message["content"]))
+        
+def not_exceeded():
+    with lock_with_timeout():
+        chatbot_state = read_state()
+        if chatbot_state.get("num_requests", 0) >= MAX_REQUESTS_WEEKLY:
+            return False
+        chatbot_state["num_requests"] += 1
+        write_state(chatbot_state)
+    return True
 
 # Main chatbot logic
 if len(st.session_state["chatbot"].get_chat_history()) < MAX_MESSAGES_IN_ONE_CONVERSATION:
-    if input := st.chat_input("Ask a question about Oberlin College"):
-        chatbot_state = read_state()
-        if chatbot_state["num_requests"] < MAX_REQUESTS_WEEKLY:
+    if input := st.chat_input("Ask a question about Oberlin College"):            
+        if not_exceeded():
             st.chat_message("user").markdown(input)
             with st.empty():
                 st.chat_message("assistant").markdown("*Hmmmm...*")
                 response = st.session_state["chatbot"].get_completion(input)
-                chatbot_state["num_requests"] += 1
-                write_state(chatbot_state)
                 st.empty()
 
             if response == "SAFETY_EXCEPTION":

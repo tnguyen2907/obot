@@ -1,0 +1,7 @@
+[client]
+showSidebarNavigation = false
+toolbarMode = "minimal"
+showErrorDetails = false
+
+[ui]
+hideTopBar = true

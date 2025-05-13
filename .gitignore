@@ -5,6 +5,7 @@ ignore*
 **/output/
 **/docker-compose.yaml
 **/chatbot_state.json
+**/.env
 
 # Terraform
 **/.terraform/*
