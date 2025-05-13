@@ -7,7 +7,7 @@ echo "[$(date)] Starting setup script"
 # Install required packages
 echo "[$(date)] Installing required packages"
 apt-get update
-apt-get install -y docker.io cron docker-credential-gcr
+apt-get install -y docker.io cron
 
 systemctl enable --now docker
 systemctl enable --now cron
@@ -24,7 +24,11 @@ echo "<html><body><h1>Server Error</h1></body></html>" > /usr/share/nginx/html/5
 
 # Docker
 echo "[$(date)] Authenticating to Artifact Registry"
-docker-credential-gcr configure-docker   # automatic Artifact Registry auth
+TOKEN=$(curl -s -H "Metadata-Flavor: Google" \
+  "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" \
+  | jq -r .access_token)
+
+echo "${TOKEN}" | docker login -u oauth2accesstoken --password-stdin ${region}-docker.pkg.dev
 
 docker network create app-network || true
 
