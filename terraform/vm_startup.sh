@@ -28,7 +28,7 @@ TOKEN=$(curl -s -H "Metadata-Flavor: Google" \
   "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" \
   | jq -r .access_token)
 
-echo "${TOKEN}" | docker login -u oauth2accesstoken --password-stdin ${region}-docker.pkg.dev
+echo $TOKEN"| docker login -u oauth2accesstoken --password-stdin ${region}-docker.pkg.dev
 
 docker network create app-network || true
 
