@@ -3,5 +3,5 @@ langchain
 langchain-google-firestore
 langchain-google-vertexai
 langchain-google-genai
-# google-generativeai>=0.3.2
+google-generativeai
 filelock
