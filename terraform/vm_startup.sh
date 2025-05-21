@@ -41,16 +41,23 @@ docker pull $IMAGE
 docker run -d --restart=always --name chatbot --network app-network $IMAGE
 
 # Get SSL certificates (one-time setup)
-for DOMAIN in obiebot.com www.obiebot.com dev.obiebot.com www.dev.obiebot.com; do
+if [ "${env}" = "dev" ]; then
+  DOMAINS="dev.obiebot.com www.dev.obiebot.com"
+else
+  DOMAINS="obiebot.com www.obiebot.com"
+fi
+
+for DOMAIN in $DOMAINS; do
   echo "[$(date)] Obtaining SSL certificate for $DOMAIN"
   docker run --rm --name certbot \
     --network host \
     -v /etc/letsencrypt:/etc/letsencrypt \
     -v /var/lib/letsencrypt:/var/lib/letsencrypt \
     -v /var/log/letsencrypt:/var/log/letsencrypt \
-    certbot/certbot certonly --standalone --preferred-challenges http \
-    --non-interactive --agree-tos --no-eff-email \
-    -d $DOMAIN
+    certbot/certbot certonly \
+      --standalone --preferred-challenges http \
+      --non-interactive --agree-tos --no-eff-email \
+      -d "$DOMAIN"
 done
 
 # Nginx
@@ -60,23 +67,31 @@ docker pull nginx:alpine
 # Create Nginx config file
 echo "[$(date)] Creating Nginx configuration"
 mkdir -p /etc/nginx/conf.d
-cat > /etc/nginx/conf.d/default.conf <<'NGINXCONF'
-# Redirect HTTP to HTTPS
+
+# Common HTTP block (ACME + redirect)
+cat > /etc/nginx/conf.d/default.conf <<'EOF'
+# Redirect HTTP to HTTPS, but serve ACME challenges
 server {
     listen 80;
     listen [::]:80;
     server_name obiebot.com www.obiebot.com dev.obiebot.com www.dev.obiebot.com;
 
-    # Let’s Encrypt http‑01 challenge
+    # ACME HTTP-01 challenge location
     location /.well-known/acme-challenge/ {
-        root /var/www/certbot;          # webroot path
+        root /var/www/certbot;
+        try_files \$uri =404;
     }
 
-    # Redirect all other HTTP requests to HTTPS
-    location / { return 301 https://$host$request_uri; }
+    # All other HTTP → HTTPS
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
 }
+EOF
 
-# Production
+if [ "${env}" = "prod" ]; then
+  cat >> /etc/nginx/conf.d/default.conf <<'EOF'
+# Production HTTPS
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
@@ -97,8 +112,11 @@ server {
         proxy_set_header Connection "upgrade";
     }
 }
+EOF
 
-# Development
+else
+  cat >> /etc/nginx/conf.d/default.conf <<'EOF'
+# Development HTTPS
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
@@ -119,7 +137,9 @@ server {
         proxy_set_header Connection "upgrade";
     }
 }
-NGINXCONF
+EOF
+fi
+
 
 # Create directory for certbot challenges
 mkdir -p /var/www/certbot
