@@ -3,4 +3,5 @@ langchain
 langchain-google-firestore
 langchain-google-vertexai
 langchain-google-genai
-redis
+google-generativeai
+filelock

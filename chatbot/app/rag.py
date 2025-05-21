@@ -16,9 +16,9 @@ from datetime import datetime
 
 GCP_PROJECT_ID = os.environ["GCP_PROJECT_ID"]
 os.environ["GCLOUD_PROJECT"] = GCP_PROJECT_ID
-os.environ["LANGCHAIN_PROJECT"] = "obot"
+os.environ["LANGSMITH_PROJECT"] = "obot"
 os.environ["LANGSMITH_TRACING"] = "true"
-os.environ["LANGCHAIN_ENDPOINT"]="https://api.smith.langchain.com"
+os.environ["LANGSMITH_ENDPOINT"]="https://api.smith.langchain.com"
 
 start_message = "Hello! 👋  I'm Obot, your helpful guide to all things Oberlin College. How can I assist you today?"
 
@@ -56,9 +56,9 @@ class ConversationalRAG:
             HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH, 
             HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         }
-        # instruct_llm = ChatGoogleGenerativeAI(
-        instruct_llm = ChatVertexAI(
-            model="gemini-1.5-pro",
+        # instruct_llm = ChatVertexAI(
+        instruct_llm = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash-preview-04-17",
             temperature=0.3,
             max_tokens=256,
             max_retries=3,
@@ -66,7 +66,7 @@ class ConversationalRAG:
         )
 
         qa_llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash-001",
+            model="gemini-2.5-flash-preview-04-17",
             temperature=0.7,
             max_tokens=1024,
             max_retries=3,

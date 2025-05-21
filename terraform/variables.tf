@@ -6,3 +6,8 @@ variable "REGION" {
   type = string
   default = "us-east1"
 }
+
+variable "ENV" {
+  type = string
+  default = "dev"
+}
