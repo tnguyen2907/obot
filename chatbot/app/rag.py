@@ -1,9 +1,10 @@
 import os
 from langchain_core.documents import Document
 from langchain_google_firestore import FirestoreVectorStore
-from langchain_google_vertexai import VertexAIEmbeddings
-from langchain_google_vertexai import ChatVertexAI
+# from langchain_google_vertexai import VertexAIEmbeddings
+# from langchain_google_vertexai import ChatVertexAI
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -27,9 +28,13 @@ class SafetyException(Exception):
 
 class ConversationalRAG:
     def __init__(self):
-        embedding_model = VertexAIEmbeddings(
-            model_name="text-embedding-004",
-            project=GCP_PROJECT_ID,
+        # embedding_model = VertexAIEmbeddings(
+        #     model_name="text-embedding-004",
+        #     project=GCP_PROJECT_ID,
+        # )
+        
+        embedding_model = GoogleGenerativeAIEmbeddings(
+            model="models/text-embedding-004",
         )
 
         vector_store = FirestoreVectorStore(
