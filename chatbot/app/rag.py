@@ -63,7 +63,7 @@ class ConversationalRAG:
         }
         # instruct_llm = ChatVertexAI(
         instruct_llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash-preview-04-17",
+            model="gemini-2.5-flash",
             temperature=0.3,
             max_tokens=256,
             max_retries=3,
@@ -71,7 +71,7 @@ class ConversationalRAG:
         )
 
         qa_llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash-preview-04-17",
+            model="gemini-2.5-flash",
             temperature=0.7,
             max_tokens=1024,
             max_retries=3,
